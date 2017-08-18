@@ -28,10 +28,14 @@ public:
 				}
 			}
 		}
+		long long int m = MOD;
 		for (int i = 0; i < S; i++) {
 			flavor[i] += row[i];
 			flavor[i] += column[i];
-			flavor[i] += 800 * S*S;
+			m = min(m, flavor[i]);
+		}
+		for (int i = 0; i < S; i++) {
+			flavor[i] -= m;
 			flavor[i] = flavor[i] * MOD + i;
 		}
 		sort(flavor.begin(), flavor.end());

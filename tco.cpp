@@ -6,6 +6,7 @@
 #include <list>
 
 using namespace std;
+const long long int MOD = 1000000000000;
 
 class ConnectedComponent {
 public:
@@ -18,27 +19,27 @@ public:
 		for (int i = 0; i < S; i++) {
 			for (int j = 0; j < S; j++) {
 				if (matrix[i*S + j] != 0) {
-					row[i] += (matrix[i*S + j] + 20)*(matrix[i*S + j] + 20);
-					column[j] += (matrix[i*S + j] + 20)*(matrix[i*S + j] + 20);
+					row[i] += (matrix[i*S + j] + 20)*abs(i - S / 2);
+					column[j] += (matrix[i*S + j] + 20)*abs(j - S / 2);
 				}
 				else{
-					row[i] -= 400;
-					column[j] -= 400;
+					row[i] -= 20 * abs(i - S / 2);
+					column[j] -= 20 * abs(j - S / 2);
 				}
 			}
 		}
 		for (int i = 0; i < S; i++) {
 			flavor[i] += row[i];
 			flavor[i] += column[i];
-			flavor[i] += 800 * S;
-			flavor[i] = flavor[i] * 1000000007 + i;
+			flavor[i] += 800 * S*S;
+			flavor[i] = flavor[i] * MOD + i;
 		}
 		sort(flavor.begin(), flavor.end());
 		reverse(flavor.begin(), flavor.end());
 		list<int>l;
 		for (int i = 0; i < S; i++) {
-			if (i % 2)l.push_back(flavor[i] % 1000000007);
-			else l.push_front(flavor[i] % 1000000007);
+			if (i % 2)l.push_back(flavor[i] % MOD);
+			else l.push_front(flavor[i] % MOD);
 		}
 		vector<int> ret(l.begin(),l.end());
 		return ret;

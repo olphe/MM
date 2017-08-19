@@ -6,46 +6,43 @@
 #include <list>
 
 using namespace std;
-const long long int MOD = 1000000000000;
+const long long int MOD = 1000000007;
 
 class ConnectedComponent {
+	
 public:
 	vector<int> permute(vector<int> matrix) {
 		int S = (int)sqrt(matrix.size());
-		sort(matrix.begin(), matrix.end());
 		vector<long long int>flavor(S,0);
 		vector<long long int>row(S,0);
 		vector<long long int>column(S,0);
-		for (int i = 0; i < S; i++) {
-			for (int j = 0; j < S; j++) {
-				if (matrix[i*S + j] != 0) {
-					row[i] += (matrix[i*S + j] + 20)*abs(i - S / 2);
-					column[j] += (matrix[i*S + j] + 20)*abs(j - S / 2);
+		vector<int>ret;
+		vector<bool>flag(S, true);
+		while (ret.size() < S) {
+			long long int box = 0;
+			for (int i = 0; i < S; i++) {
+				if (!flag[i])continue;
+				long long int bag = 0;
+				for (int j = 0; j < S; j++) {
+					if (!flag[j]||i==j) {
+						if (matrix[i*S + j]!=0) {
+							bag += (matrix[i*S + j] + 10);
+						}
+						if (matrix[j*S + i]!=0) {
+							bag += (matrix[j*S + i] + 10);
+						}
+					}
 				}
-				else{
-					row[i] -= 20 * abs(i - S / 2);
-					column[j] -= 20 * abs(j - S / 2);
+				if (matrix[i*S + i]!=0) {
+					bag -= (matrix[i*S + i] + 10);
+				}
+				if (box <= bag*MOD + i) {
+					box = bag*MOD + i;
 				}
 			}
+			ret.push_back(box%MOD);
+			flag[box%MOD] = false;
 		}
-		long long int m = MOD;
-		for (int i = 0; i < S; i++) {
-			flavor[i] += row[i];
-			flavor[i] += column[i];
-			m = min(m, flavor[i]);
-		}
-		for (int i = 0; i < S; i++) {
-			flavor[i] -= m;
-			flavor[i] = flavor[i] * MOD + i;
-		}
-		sort(flavor.begin(), flavor.end());
-		reverse(flavor.begin(), flavor.end());
-		list<int>l;
-		for (int i = 0; i < S; i++) {
-			if (i % 2)l.push_back(flavor[i] % MOD);
-			else l.push_front(flavor[i] % MOD);
-		}
-		vector<int> ret(l.begin(),l.end());
 		return ret;
 	}
 };

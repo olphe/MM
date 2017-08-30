@@ -27,7 +27,7 @@ public:
 };
 
 class KnightsAttacks {
-	const int loop = 10000000;
+	int loop=10000;
 	int diry[8] = { 1,2,2,1,-1,-2,-2,-1 };
 	int dirx[8] = { -2,-1,1,2,2,1,-1,-2 };
 	bool In(int h, int w, int y, int x) {
@@ -99,7 +99,7 @@ public:
 			int dif = 0;
 			for (int j = 0; j < 8; j++) {
 				if (In(S, S, y + diry[j], x + dirx[j])) {
-					dif = abs(attacked[y + diry[j]][x + dirx[j]] - board[i][j] + '0') - abs(attacked[y + diry[j]][x + dirx[j]] + add - board[i][j] + '0');
+					dif = abs(attacked[y + diry[j]][x + dirx[j]] - board[y][x] + '0') - abs(attacked[y + diry[j]][x + dirx[j]] + add - board[y][x] + '0');
 				}
 			}
 			if (dif < 0) {

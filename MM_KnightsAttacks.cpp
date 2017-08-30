@@ -27,7 +27,7 @@ public:
 };
 
 class KnightsAttacks {
-	int loop=10000;
+	int loop=10000000;
 	int diry[8] = { 1,2,2,1,-1,-2,-2,-1 };
 	int dirx[8] = { -2,-1,1,2,2,1,-1,-2 };
 	bool In(int h, int w, int y, int x) {
@@ -99,15 +99,21 @@ public:
 			int dif = 0;
 			for (int j = 0; j < 8; j++) {
 				if (In(S, S, y + diry[j], x + dirx[j])) {
-					dif = abs(attacked[y + diry[j]][x + dirx[j]] - board[y][x] + '0') - abs(attacked[y + diry[j]][x + dirx[j]] + add - board[y][x] + '0');
+					dif += (abs(attacked[y + diry[j]][x + dirx[j]] - board[y+diry[j]][x+dirx[j]] + '0') - abs(attacked[y + diry[j]][x + dirx[j]] + add - board[y+diry[j]][x+dirx[j]] + '0'));
 				}
 			}
-			if (dif < 0) {
+		//	cout << dif << endl;
+			if (dif > 0) {
 				if (ret[y][x] == 'K') {
 					ret[y][x] = '.';
 				}
 				else {
-					ret[y][x] == 'K';
+					ret[y][x] = 'K';
+				}
+				for (int j = 0; j < 8; j++) {
+					if (In(S, S, y + diry[j], x + dirx[j])) {
+						attacked[y + diry[j]][x + dirx[j]] += add;
+					}
 				}
 			}
 			else if (dif == 0 && xs.rand() % 2) {
@@ -115,7 +121,12 @@ public:
 					ret[y][x] = '.';
 				}
 				else {
-					ret[y][x] == 'K';
+					ret[y][x] = 'K';
+				}
+				for (int j = 0; j < 8; j++) {
+					if (In(S, S, y + diry[j], x + dirx[j])) {
+						attacked[y + diry[j]][x + dirx[j]] += add;
+					}
 				}
 			}
 		}

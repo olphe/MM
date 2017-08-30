@@ -9,7 +9,7 @@ using namespace std;
 class XorShift {
 	unsigned int x, y, z, w, t;
 public:
-	XorShift() {
+	XorShift(){
 		x = 123456789;
 		y = 512821133;
 		z = 756587678;
@@ -27,7 +27,7 @@ public:
 };
 
 class KnightsAttacks {
-	int loop;
+	int loop=1000000;
 	int diry[8] = { 1,2,2,1,-1,-2,-2,-1 };
 	int dirx[8] = { -2,-1,1,2,2,1,-1,-2 };
 	bool In(int h, int w, int y, int x) {
@@ -42,7 +42,6 @@ public:
 	XorShift xs;
 	vector<string> placeKnights(vector<string> board) {
 		int S = board.size();
-		loop = 10000000 / (S*S);
 		vector<string> ret(S, string(S, '.'));
 		vector<vector<int>> all(S, vector<int>(S, 0));
 		vector<vector<int>>child(S, vector<int>(S, 0));
@@ -69,7 +68,7 @@ public:
 		}
 		for (int i = 0; i < S; ++i) {
 			for (int j = 0; j < S; ++j) {
-				if (parent[i][j] < child[i][j] * 2) {
+				if (parent[i][j]<child[i][j]*2) {
 					ret[i][j] = 'K';
 					for (int k = 0; k < 8; k++) {
 						if (In(S, S, i + diry[k], j + dirx[k])) {
@@ -89,87 +88,89 @@ public:
 				}
 			}
 		}
-		for (int a = 0; a < loop; a++) {
-			for (int i = 0; i < S; i++) {
-				for (int j = 0; j < S; j++){
+		for(int a=0;a<10;a++){
+			for (int i = 0; i < loop; i++) {
+				int y, x;
+				y = xs.rand() % S;
+				x = xs.rand() % S;
+				int add = 1;
+				if (ret[y][x] == 'K') {
+					add = -1;
+				}
+				int dif = 0;
+				for (int j = 0; j < 8; j++) {
+					if (In(S, S, y + diry[j], x + dirx[j])) {
+						dif += (abs(attacked[y + diry[j]][x + dirx[j]] - board[y + diry[j]][x + dirx[j]] + '0') - abs(attacked[y + diry[j]][x + dirx[j]] + add - board[y + diry[j]][x + dirx[j]] + '0'));
+					}
+				}
+				if (dif > 0||(dif == 0 && xs.rand() % 2)) {
+					if (ret[y][x] == 'K') {
+						ret[y][x] = '.';
+					}
+					else {
+						ret[y][x] = 'K';
+					}
+					for (int j = 0; j < 8; j++) {
+						if (In(S, S, y + diry[j], x + dirx[j])) {
+							attacked[y + diry[j]][x + dirx[j]] += add;
+						}
+					}
+				}
+			}
+			for (int i = 0; i < loop; i++) {
+				int y, x;
+				y = xs.rand() % S;
+				x = xs.rand() % S;
+				int dif[10][10] = {};
+				vector<bool>change(8, false);
+				for (int k = 0; k < 8; k++) {
+					if (!In(S, S, y + diry[k], x + dirx[k]))continue;
+					if (xs.rand() % 2)continue;
+					change[k] = true;
+					int cy = y + diry[k];
+					int cx = x + dirx[k];
 					int add = 1;
-					if (ret[i][j] == 'K') {
+					if (ret[cy][cx] == 'K') {
 						add = -1;
 					}
-					int dif = 0;
-					for (int k = 0; k < 8; k++) {
-						if (In(S, S, i + diry[k], j + dirx[k])) {
-							dif += (abs(attacked[i + diry[k]][j + dirx[k]] - board[i + diry[k]][j + dirx[k]] + '0') - abs(attacked[i + diry[k]][j + dirx[k]] + add - board[i + diry[k]][j + dirx[k]] + '0'));
+					for (int j = 0; j < 8; j++) {
+						if (In(S, S, cy + diry[j], cx + dirx[j])) {
+							dif[diry[k] + diry[j] + 4][dirx[k] + dirx[j] + 4] += add;
 						}
 					}
-					if (dif > 0||(dif==0&&xs.rand()%2)) {
-						if (ret[i][j] == 'K') {
-							ret[i][j] = '.';
+				}
+				int sum = 0;
+				for (int j = 0; j < 9; j++) {
+					for (int k= 0; k < 9; k++) {
+						if (!dif[j][k])continue;
+						if (In(S, S, y + j-4, x + k-4)) {
+							sum += (abs(attacked[y + j-4][x + k-4] - board[y + j-4][x + k-4] + '0') - abs(attacked[y + j-4][x + k-4] + dif[j][k] - board[y + j-4][x + k-4] + '0'));
+						}
+					}
+				}
+				if (sum > 0||(sum == 0 && xs.rand() % 2)) {
+					for (int k = 0; k < 8; k++) {
+						if (!change[k])continue;
+						int cy = y + diry[k];
+						int cx = x + dirx[k];
+						int add = 1;
+						if (ret[cy][cx] == 'K') {
+							add = -1;
+						}
+						if (ret[cy][cx] == 'K') {
+							ret[cy][cx] = '.';
 						}
 						else {
-							ret[i][j] = 'K';
+							ret[cy][cx] = 'K';
 						}
-						for (int k = 0; k < 8; k++) {
-							if (In(S, S, i + diry[k], j + dirx[k])) {
-								attacked[i + diry[k]][j + dirx[k]] += add;
+						for (int j = 0; j < 8; j++) {
+							if (In(S, S, cy + diry[j], cx + dirx[j])) {
+								attacked[cy + diry[j]][cx + dirx[j]] += add;
 							}
 						}
 					}
 				}
 			}
-			for (int i = 0; i < S; i++) {
-				for (int j = 0; j < S; j++) {
-					int dif[10][10] = {};
-					vector<bool>change(8, false);
-					for (int k = 0; k < 8; k++) {
-						if (!In(S, S, i + diry[k], j + dirx[k]))continue;
-						if (xs.rand() % 2)continue;
-						change[k] = true;
-						int cy = i + diry[k];
-						int cx = j + dirx[k];
-						int add = 1;
-						if (ret[cy][cx] == 'K') {
-							add = -1;
-						}
-						for (int l = 0; l < 8; l++) {
-							if (In(S, S, cy + diry[l], cx + dirx[l])) {
-								dif[diry[k] + diry[l] + 4][dirx[k] + dirx[l] + 4] += add;
-							}
-						}
-					}
-					int sum = 0;
-					for (int l = 0; l < 9; l++) {
-						for (int k = 0; k < 9; k++) {
-							if (!dif[l][k])continue;
-							if (In(S, S, i + l - 4, j + k - 4)) {
-								sum += (abs(attacked[i + l - 4][j + k - 4] - board[i + l - 4][j + k - 4] + '0') - abs(attacked[i + l - 4][j + k - 4] + dif[l][k] - board[i + l - 4][j + k - 4] + '0'));
-							}
-						}
-					}
-					if (sum > 0||(sum==0&&xs.rand()%2)) {
-						for (int k = 0; k < 8; k++) {
-							if (!change[k])continue;
-							int cy = i + diry[k];
-							int cx = j + dirx[k];
-							int add = 1;
-							if (ret[cy][cx] == 'K') {
-								add = -1;
-							}
-							if (ret[cy][cx] == 'K') {
-								ret[cy][cx] = '.';
-							}
-							else {
-								ret[cy][cx] = 'K';
-							}
-							for (int l = 0; l < 8; l++) {
-								if (In(S, S, cy + diry[l], cx + dirx[l])) {
-									attacked[cy + diry[l]][cx + dirx[l]] += add;
-								}
-							}
-						}
-					}
-				}
-			}	
 		}
 		return ret;
 	}

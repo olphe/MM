@@ -27,7 +27,7 @@ public:
 };
 
 class KnightsAttacks {
-	int loop=10000000;
+	int loop=1000000;
 	int diry[8] = { 1,2,2,1,-1,-2,-2,-1 };
 	int dirx[8] = { -2,-1,1,2,2,1,-1,-2 };
 	bool In(int h, int w, int y, int x) {
@@ -88,7 +88,7 @@ public:
 				}
 			}
 		}
-		//for(int a=0;a<10;a++){
+		for(int a=0;a<10;a++){
 			for (int i = 0; i < loop; i++) {
 				int y, x;
 				y = xs.rand() % S;
@@ -207,7 +207,7 @@ public:
 					}
 				}
 			}
-		//}
+		}
 		return ret;
 	}
 };

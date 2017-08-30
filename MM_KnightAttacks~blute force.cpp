@@ -43,6 +43,8 @@ public:
 	vector<string> placeKnights(vector<string> board) {
 		int S = board.size();
 		loop = 10000000 / (S*S);
+		int ratio = 200;
+		int MOD = 10000;
 		vector<string> ret(S, string(S, '.'));
 		vector<vector<int>> all(S, vector<int>(S, 0));
 		vector<vector<int>>child(S, vector<int>(S, 0));
@@ -90,6 +92,7 @@ public:
 			}
 		}
 		for (int a = 0; a < loop; a++) {
+			ratio -= ratio / (loop - a);
 			for (int i = 0; i < S; i++) {
 				for (int j = 0; j < S; j++){
 					int add = 1;
@@ -102,7 +105,7 @@ public:
 							dif += (abs(attacked[i + diry[k]][j + dirx[k]] - board[i + diry[k]][j + dirx[k]] + '0') - abs(attacked[i + diry[k]][j + dirx[k]] + add - board[i + diry[k]][j + dirx[k]] + '0'));
 						}
 					}
-					if (dif > 0||(dif==0&&xs.rand()%2)) {
+					if ((dif > 0&&xs.rand()%MOD>ratio)||(dif==0&&xs.rand()%2&&xs.rand()>ratio)||(dif<0&&xs.rand()%MOD<ratio)) {
 						if (ret[i][j] == 'K') {
 							ret[i][j] = '.';
 						}
@@ -169,7 +172,7 @@ public:
 						}
 					}
 				}
-			}	
+			}
 		}
 		return ret;
 	}

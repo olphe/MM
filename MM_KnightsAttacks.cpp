@@ -88,48 +88,126 @@ public:
 				}
 			}
 		}
-		for (int i = 0; i < loop; i++) {
-			int y, x;
-			y = xs.rand() % S;
-			x = xs.rand() % S;
-			int add = 1;
-			if (ret[y][x] == 'K') {
-				add = -1;
-			}
-			int dif = 0;
-			for (int j = 0; j < 8; j++) {
-				if (In(S, S, y + diry[j], x + dirx[j])) {
-					dif += (abs(attacked[y + diry[j]][x + dirx[j]] - board[y+diry[j]][x+dirx[j]] + '0') - abs(attacked[y + diry[j]][x + dirx[j]] + add - board[y+diry[j]][x+dirx[j]] + '0'));
-				}
-			}
-		//	cout << dif << endl;
-			if (dif > 0) {
+		//for(int a=0;a<10;a++){
+			for (int i = 0; i < loop; i++) {
+				int y, x;
+				y = xs.rand() % S;
+				x = xs.rand() % S;
+				int add = 1;
 				if (ret[y][x] == 'K') {
-					ret[y][x] = '.';
+					add = -1;
 				}
-				else {
-					ret[y][x] = 'K';
-				}
+				int dif = 0;
 				for (int j = 0; j < 8; j++) {
 					if (In(S, S, y + diry[j], x + dirx[j])) {
-						attacked[y + diry[j]][x + dirx[j]] += add;
+						dif += (abs(attacked[y + diry[j]][x + dirx[j]] - board[y + diry[j]][x + dirx[j]] + '0') - abs(attacked[y + diry[j]][x + dirx[j]] + add - board[y + diry[j]][x + dirx[j]] + '0'));
+					}
+				}
+				//	cout << dif << endl;
+				if (dif > 0) {
+					if (ret[y][x] == 'K') {
+						ret[y][x] = '.';
+					}
+					else {
+						ret[y][x] = 'K';
+					}
+					for (int j = 0; j < 8; j++) {
+						if (In(S, S, y + diry[j], x + dirx[j])) {
+							attacked[y + diry[j]][x + dirx[j]] += add;
+						}
+					}
+				}
+				else if (dif == 0 && xs.rand() % 2) {
+					if (ret[y][x] == 'K') {
+						ret[y][x] = '.';
+					}
+					else {
+						ret[y][x] = 'K';
+					}
+					for (int j = 0; j < 8; j++) {
+						if (In(S, S, y + diry[j], x + dirx[j])) {
+							attacked[y + diry[j]][x + dirx[j]] += add;
+						}
 					}
 				}
 			}
-			else if (dif == 0 && xs.rand() % 2) {
-				if (ret[y][x] == 'K') {
-					ret[y][x] = '.';
+			for (int i = 0; i < loop; i++) {
+				int y, x;
+				y = xs.rand() % S;
+				x = xs.rand() % S;
+				int dif[10][10] = {};
+				vector<bool>change(8, false);
+				for (int k = 0; k < 8; k++) {
+					if (!In(S, S, y + diry[k], x + dirx[k]))continue;
+					if (xs.rand() % 2)continue;
+					change[k] = true;
+					int cy = y + diry[k];
+					int cx = x + dirx[k];
+					int add = 1;
+					if (ret[cy][cx] == 'K') {
+						add = -1;
+					}
+					for (int j = 0; j < 8; j++) {
+						if (In(S, S, cy + diry[j], cx + dirx[j])) {
+							dif[diry[k] + diry[j] + 4][dirx[k] + dirx[j] + 4] += add;
+						}
+					}
 				}
-				else {
-					ret[y][x] = 'K';
+				int sum = 0;
+				for (int j = 0; j < 9; j++) {
+					for (int k= 0; k < 9; k++) {
+						if (!dif[j][k])continue;
+						if (In(S, S, y + j-4, x + k-4)) {
+							sum += (abs(attacked[y + j-4][x + k-4] - board[y + j-4][x + k-4] + '0') - abs(attacked[y + j-4][x + k-4] + dif[j][k] - board[y + j-4][x + k-4] + '0'));
+						}
+					}
 				}
-				for (int j = 0; j < 8; j++) {
-					if (In(S, S, y + diry[j], x + dirx[j])) {
-						attacked[y + diry[j]][x + dirx[j]] += add;
+				if (sum > 0) {
+					for (int k = 0; k < 8; k++) {
+						if (!change[k])continue;
+						int cy = y + diry[k];
+						int cx = x + dirx[k];
+						int add = 1;
+						if (ret[cy][cx] == 'K') {
+							add = -1;
+						}
+						if (ret[cy][cx] == 'K') {
+							ret[cy][cx] = '.';
+						}
+						else {
+							ret[cy][cx] = 'K';
+						}
+						for (int j = 0; j < 8; j++) {
+							if (In(S, S, cy + diry[j], cx + dirx[j])) {
+								attacked[cy + diry[j]][cx + dirx[j]] += add;
+							}
+						}
+					}
+				}
+				else if (sum == 0 && xs.rand() % 2) {
+					for (int k = 0; k < 8; k++) {
+						if (!change[k])continue;
+						int cy = y + diry[k];
+						int cx = x + dirx[k];
+						int add = 1;
+						if (ret[cy][cx] == 'K') {
+							add = -1;
+						}
+						if (ret[cy][cx] == 'K') {
+							ret[cy][cx] = '.';
+						}
+						else {
+							ret[cy][cx] = 'K';
+						}
+						for (int j = 0; j < 8; j++) {
+							if (In(S, S, cy + diry[j], cx + dirx[j])) {
+								attacked[cy + diry[j]][cx + dirx[j]] += add;
+							}
+						}
 					}
 				}
 			}
-		}
+		//}
 		return ret;
 	}
 };

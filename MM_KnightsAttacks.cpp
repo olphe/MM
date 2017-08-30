@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 
+
 using namespace std;
 
 class XorShift {
@@ -26,6 +27,7 @@ public:
 };
 
 class KnightsAttacks {
+	const int loop = 10000000;
 	int diry[8] = { 1,2,2,1,-1,-2,-2,-1 };
 	int dirx[8] = { -2,-1,1,2,2,1,-1,-2 };
 	bool In(int h, int w, int y, int x) {
@@ -44,6 +46,7 @@ public:
 		vector<vector<int>> all(S, vector<int>(S, 0));
 		vector<vector<int>>child(S, vector<int>(S, 0));
 		vector<vector<int>>parent(S, vector<int>(S, 0));
+		vector<vector<int>>attacked(S, vector<int>(S, 0));
 		for (int i = 0; i < S; i++) {
 			for (int j = 0; j < S; j++) {
 				for (int k = 0; k < 8; k++) {
@@ -57,22 +60,62 @@ public:
 			for (int j = 0; j < S; j++) {
 				for (int k = 0; k < 8; k++) {
 					if (In(S, S, i + diry[k], j + dirx[k])) {
-						child[i + diry[k]][j + dirx[k]] += (int)(board[i][j] - '0');
+						child[i + diry[k]][j + dirx[k]] += board[i][j] - '0';
 						parent[i + diry[k]][j + dirx[k]] += all[i][j];
 					}
 				}
 			}
 		}
-
 		for (int i = 0; i < S; ++i) {
 			for (int j = 0; j < S; ++j) {
 				if (parent[i][j]<child[i][j]*2) {
 					ret[i][j] = 'K';
+					for (int k = 0; k < 8; k++) {
+						if (In(S, S, i + diry[k], j + dirx[k])) {
+							attacked[i + diry[k]][j + dirx[k]]++;
+						}
+					}
 				}
 				if (parent[i][j] == child[i][j] * 2) {
 					if (xs.rand() % 2) {
 						ret[i][j] = 'K';
+						for (int k = 0; k < 8; k++) {
+							if (In(S, S, i + diry[k], j + dirx[k])) {
+								attacked[i + diry[k]][j + dirx[k]]++;
+							}
+						}
 					}
+				}
+			}
+		}
+		for (int i = 0; i < loop; i++) {
+			int y, x;
+			y = xs.rand() % S;
+			x = xs.rand() % S;
+			int add = 1;
+			if (ret[y][x] == 'K') {
+				add = -1;
+			}
+			int dif = 0;
+			for (int j = 0; j < 8; j++) {
+				if (In(S, S, y + diry[j], x + dirx[j])) {
+					dif = abs(attacked[y + diry[j]][x + dirx[j]] - board[i][j] + '0') - abs(attacked[y + diry[j]][x + dirx[j]] + add - board[i][j] + '0');
+				}
+			}
+			if (dif < 0) {
+				if (ret[y][x] == 'K') {
+					ret[y][x] = '.';
+				}
+				else {
+					ret[y][x] == 'K';
+				}
+			}
+			else if (dif == 0 && xs.rand() % 2) {
+				if (ret[y][x] == 'K') {
+					ret[y][x] = '.';
+				}
+				else {
+					ret[y][x] == 'K';
 				}
 			}
 		}

@@ -137,9 +137,9 @@ public:
 						if (!In(S, S, i + diry[k], j + dirx[k]))continue;
 						if (xs.rand() % all[i][j] < (board[i][j] - '0')) {
 							change[k] = true;
-							if (ret[i + diry[k]][j + dirx[k]] == 'K')continue;
 							int cy = i + diry[k];
 							int cx = j + dirx[k];
+							if (ret[cy][cx] == 'K')continue;
 							int add = 1;
 							for (int l = 0; l < 8; l++) {
 								if (In(S, S, cy + diry[l], cx + dirx[l])) {
@@ -148,10 +148,10 @@ public:
 							}
 						}
 						else {
-							if (ret[i + diry[k]][j + dirx[k]] != 'K')continue;
 							change[k] = false;
 							int cy = i + diry[k];
 							int cx = j + dirx[k];
+							if (ret[cy][cx] != 'K')continue;
 							int add = -1;
 							for (int l = 0; l < 8; l++) {
 								if (In(S, S, cy + diry[l], cx + dirx[l])) {
@@ -171,6 +171,7 @@ public:
 					}
 					if (sum > 0||(sum==0&&xs.rand()%2)) {
 						for (int k = 0; k < 8; k++) {
+							if (!In(S, S, i + diry[k], j + dirx[k]))continue;
 							if (change[k]) {
 								int cy = i + diry[k];
 								int cx = j + dirx[k];

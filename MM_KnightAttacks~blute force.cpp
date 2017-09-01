@@ -42,8 +42,17 @@ public:
 	XorShift xs;
 	vector<string> placeKnights(vector<string> board) {
 		int S = board.size();
-		loop = 10000000 / (S*S);
-		int ratio = 200;
+		loop = 15000000 / (S*S);
+		int ratio;
+		if (S < 250) {
+			ratio = 100;
+		}
+		else if (S < 400) {
+			ratio = 50;
+		}
+		else {
+			ratio = 25;
+		}
 		int MOD = 10000;
 		vector<string> ret(S, string(S, '.'));
 		vector<vector<int>> all(S, vector<int>(S, 0));
@@ -126,17 +135,28 @@ public:
 					vector<bool>change(8, false);
 					for (int k = 0; k < 8; k++) {
 						if (!In(S, S, i + diry[k], j + dirx[k]))continue;
-						if (xs.rand() % 2)continue;
-						change[k] = true;
-						int cy = i + diry[k];
-						int cx = j + dirx[k];
-						int add = 1;
-						if (ret[cy][cx] == 'K') {
-							add = -1;
+						if (xs.rand() % all[i][j] < (board[i][j] - '0')) {
+							change[k] = true;
+							if (ret[i + diry[k]][j + dirx[k]] == 'K')continue;
+							int cy = i + diry[k];
+							int cx = j + dirx[k];
+							int add = 1;
+							for (int l = 0; l < 8; l++) {
+								if (In(S, S, cy + diry[l], cx + dirx[l])) {
+									dif[diry[k] + diry[l] + 4][dirx[k] + dirx[l] + 4] += add;
+								}
+							}
 						}
-						for (int l = 0; l < 8; l++) {
-							if (In(S, S, cy + diry[l], cx + dirx[l])) {
-								dif[diry[k] + diry[l] + 4][dirx[k] + dirx[l] + 4] += add;
+						else {
+							if (ret[i + diry[k]][j + dirx[k]] != 'K')continue;
+							change[k] = false;
+							int cy = i + diry[k];
+							int cx = j + dirx[k];
+							int add = -1;
+							for (int l = 0; l < 8; l++) {
+								if (In(S, S, cy + diry[l], cx + dirx[l])) {
+									dif[diry[k] + diry[l] + 4][dirx[k] + dirx[l] + 4] += add;
+								}
 							}
 						}
 					}
@@ -151,22 +171,28 @@ public:
 					}
 					if (sum > 0||(sum==0&&xs.rand()%2)) {
 						for (int k = 0; k < 8; k++) {
-							if (!change[k])continue;
-							int cy = i + diry[k];
-							int cx = j + dirx[k];
-							int add = 1;
-							if (ret[cy][cx] == 'K') {
-								add = -1;
-							}
-							if (ret[cy][cx] == 'K') {
-								ret[cy][cx] = '.';
+							if (change[k]) {
+								int cy = i + diry[k];
+								int cx = j + dirx[k];
+								if (ret[cy][cx] == 'K')continue;
+								int add = 1;
+								ret[cy][cx] = 'K';
+								for (int l = 0; l < 8; l++) {
+									if (In(S, S, cy + diry[l], cx + dirx[l])) {
+										attacked[cy + diry[l]][cx + dirx[l]] += add;
+									}
+								}
 							}
 							else {
-								ret[cy][cx] = 'K';
-							}
-							for (int l = 0; l < 8; l++) {
-								if (In(S, S, cy + diry[l], cx + dirx[l])) {
-									attacked[cy + diry[l]][cx + dirx[l]] += add;
+								int cy = i + diry[k];
+								int cx = j + dirx[k];
+								if (ret[cy][cx] != 'K')continue;
+								int add = -1;
+								ret[cy][cx] = '.';
+								for (int l = 0; l < 8; l++) {
+									if (In(S, S, cy + diry[l], cx + dirx[l])) {
+										attacked[cy + diry[l]][cx + dirx[l]] += add;
+									}
 								}
 							}
 						}

@@ -10,10 +10,10 @@ class XorShift {
 	unsigned int x, y, z, w, t;
 public:
 	XorShift() {
-		x = 123456789;
-		y = 512821133;
-		z = 756587678;
-		w = 176232445;
+		x = 133553533;
+		y = 314867339;
+		z = 664298413;
+		w = 999999937;
 		t = 0;
 	}
 	unsigned int rand() {
@@ -74,7 +74,7 @@ public:
 							dif += (abs(attacked[i + diry[k]][j + dirx[k]] - board[i + diry[k]][j + dirx[k]] + '0') - abs(attacked[i + diry[k]][j + dirx[k]] + add - board[i + diry[k]][j + dirx[k]] + '0'));
 						}
 					}
-					if ((dif > 0 && xs.rand() % MOD>ratio) || (dif == 0 && xs.rand() % 2 && xs.rand()>ratio) || (dif<0 && xs.rand() % MOD<ratio)) {
+					if (dif > 0 || (dif == 0 && xs.rand() % 2) || (dif<0 && xs.rand() % MOD<ratio)) {
 						if (ret[i][j] == 'K') {
 							ret[i][j] = '.';
 						}

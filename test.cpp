@@ -33,7 +33,7 @@ class ConstrainedPermutation {
 public:
 	XorShift xs;
 	const long long int MOD = 1000000007;
-	vector<int> permute(int N, vector<string> constraints) {
+	vector<int> permute(int N, vector<string> constraints,int rate) {
 		int K = constraints.size();
 		vector<int> ret(N);
 		vector<int>first_to(N);
@@ -130,7 +130,7 @@ public:
 		long long int max_loop = 50000000;
 		while (loop < max_loop) {
 			int c_num = xs.rand() % 100;
-			if (c_num < 5) {
+			if (c_num < rate) {
 				c_num = 3;
 			}
 			else {
@@ -173,7 +173,7 @@ public:
 					change--;
 				}
 			}
-			if (change < 0&&(xs.rand()%div>=temp)) {
+			if (change < 0 && (xs.rand() % div >= temp)) {
 				for (int i = c_num - 2; i >= 0; i--) {
 					swap(ret[cont[i]], ret[cont[i + 1]]);
 				}
@@ -186,18 +186,45 @@ public:
 
 int main() {
 	ConstrainedPermutation cp;
-	int N, K;
-	cin >> N >> K;
-	vector<string> constraints(K);
-	for (int k = 0; k < K; ++k) {
-		int i, j;
-		cin >> i >> j;
-		constraints[k] = to_string(i) + " " + to_string(j);
-	}
+	FILE *ifile[100];
+	FILE *ofile[100];
+	int testcase = 10;
 
-	vector<int> ret = cp.permute(N, constraints);
-	cout << ret.size() << endl;
-	for (int i = 0; i < (int)ret.size(); ++i)
-		cout << ret[i] << endl;
-	cout.flush();
+	for (int i = 0; i < testcase; i++) {
+		char s[100] = {};
+		char t[100] = {};
+		sprintf(s, "case/test%d.txt", i + 1);
+		ifile[i] = fopen(s, "r");
+		sprintf(t, "output/test%d.txt", i + 1);
+		ofile[i] = fopen(t, "w");
+	}
+	long double score = 0;
+	for (int loop = 0; loop < testcase; loop++) {
+		int N, K;
+		fscanf(ifile[loop], "%d %d", &N, &K);
+		vector<string> constraints(K);
+		vector<int>a(K);
+		vector<int>b(K);
+		for (int k = 0; k < K; ++k) {
+			fscanf(ifile[loop], "%d %d", &a[k], &b[k]);
+			constraints[k] = to_string(a[k]) + " " + to_string(b[k]);
+		}
+		long double best = 0;
+		for (int i = 1; i <= 15; i++) {
+
+				vector<int> ret = cp.permute(N, constraints, i);
+				int sum = 0;
+				for (int k = 0; k < K; k++) {
+					if (ret[a[k]] < ret[b[k]]) {
+						sum++;
+					}
+				}
+				long double ans = (long double)sum / K;
+				best = max(best, ans);
+				cout << loop + 1 << " " << i << " " << ans << endl;
+				//fprintf(ofile[loop], "%d %16f\n", (int)(j*pow(10, i)), ans);
+		}
+		score += best;
+		cout << loop + 1 << " " << best << endl;
+	}
 }

@@ -59,18 +59,17 @@ public:
 		}
 		XorShift xs;
 		for (int loop = 0; loop < N; loop++) {
-			//cout << loop << endl;
+			int r = min(H, W)*(N - loop - 1) / N;
 			int y, x;
 			y = xs.rand() % H;
 			x = xs.rand() % W;
-			int r = min(H, W)*(N - loop-1) / N;
 			int red = 0, blue = 0, green = 0;
 			int px = 0;
 			for (int radius = 0; radius <= r; radius++) {
 				for (auto i : search[radius]) {
 					int cy = y + i.first;
 					int cx = x + i.second;
-					if (cy<0 || cy>y || cx<0 || cx>x) {
+					if (cy<0 || cy>=H || cx<0 || cx>=W) {
 						continue;
 					}
 					px++;
@@ -85,13 +84,13 @@ public:
 			red = max(0, min(255, red));
 			green = max(0, min(255, green));
 			blue = max(0, min(255, blue));
-			int color = (red << 16 )+ (green << 8) + blue;
+			int color = (red << 16) + (green << 8) + blue;
 			add({ y,x,r,color });
 			for (int radius = 0; radius <= r; radius++) {
 				for (auto i : search[radius]) {
 					int cy = y + i.first;
 					int cx = x + i.second;
-					if (cy<0 || cy>y || cx<0 || cx>x) {
+					if (cy<0 || cy>=H || cx<0 || cx>=W) {
 						continue;
 					}
 					red = Red(color) + Red(C[cy*W + cx]);

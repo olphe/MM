@@ -43,7 +43,7 @@ public:
 		r = 0;
 		color = 0;
 		score = 0;
-		return; 
+		return;
 	}
 	bool operator < (const Candidate& c) const {
 		return score < c.score;
@@ -74,39 +74,35 @@ public:
 	}
 	vector<int> drawImage(int H, vector<int> pixels, int N) {
 		int W = pixels.size() / H;
-		vector<vector<pair<int, int>>>search(1001);
-		vector<int>sumsum(1001);
+		int div = min(H, W) / sqrt(N*min(H, W) / max(H, W) / 5);
+		vector<vector<pair<int, int>>>search(div + 1);
+		vector<int>sumsum(div + 1);
 		vector<int> C(pixels.size(), 0x000000);
-		for (int i = -1000; i <= 1000; i++) {
-			for (int j = -1000; j <= 1000; j++) {
-				if ((int)(sqrt(i*i + j*j)) > 1000) {
+		for (int i = -div; i <= div; i++) {
+			for (int j = -div; j <= div; j++) {
+				if ((int)(sqrt(i*i + j*j)) > div) {
 					continue;
 				}
 				search[(int)sqrt(i*i + j*j)].push_back({ i,j });
 			}
 		}
 		sumsum[0] = search[0].size();
-		for (int i = 1; i <= 1000; i++) {
+		for (int i = 1; i <= div; i++) {
 			sumsum[i] = sumsum[i - 1] + search[i].size();
 		}
 		XorShift xs;
+		long double m_loop = 0;
+		long long int looop = 0;
 		for (int loop = 0; loop < N; loop++) {
-			//cout << loop << endl;
-			int r = min(H, W)*(N - loop - 1) / N + xs.rand() % 10;
-			r = min(r, 1000);
-			vector<Candidate>box;
-			long double m_loop = (long double)300000000 * (r + min(H, W) / 2) / min(H, W) / N / sumsum[r];
-			long long int max_loop = m_loop;
-			m_loop -= max_loop;
-			if ((long double)xs.rand() * 100 < m_loop) {
-				max_loop++;
-			}
-			max_loop = max(max_loop, (long long int)1);
-			max_loop = min(max_loop, (long long int)H*W);
-			for (int looop = 0; looop < max_loop; looop++) {
+			Candidate box;
+			m_loop += (long double)1250000000 / N;
+			for (; looop < m_loop; ) {
 				int y, x;
 				y = xs.rand() % H;
 				x = xs.rand() % W;
+				int r = div*(N - loop - 1) / N + xs.rand() % (xs.rand() % 18 + 5);
+				r = min(r, div);
+				looop += sumsum[r];
 				int red = 0, blue = 0, green = 0;
 				int px = 0;
 				Candidate candidate;
@@ -114,7 +110,7 @@ public:
 					for (auto i : search[radius]) {
 						int cy = y + i.first;
 						int cx = x + i.second;
-						if (cy<0 || cy>=H || cx<0 || cx>=W) {
+						if (cy<0 || cy >= H || cx<0 || cx >= W) {
 							continue;
 						}
 						px++;
@@ -133,8 +129,6 @@ public:
 				green = max(0, min(255, green));
 				blue = max(0, min(255, blue));
 				int color = (red << 16) + (green << 8) + blue;
-				
-				//add({ y,x,r,color });
 				candidate.x = x;
 				candidate.y = y;
 				candidate.r = r;
@@ -143,7 +137,7 @@ public:
 					for (auto i : search[radius]) {
 						int cy = y + i.first;
 						int cx = x + i.second;
-						if (cy<0 || cy>=H || cx<0 || cx>=W) {
+						if (cy<0 || cy >= H || cx<0 || cx >= W) {
 							continue;
 						}
 						red = Red(color) + Red(C[cy*W + cx]);
@@ -152,28 +146,29 @@ public:
 						green /= 2;
 						blue = Blue(color) + Blue(C[cy*W + cx]);
 						blue /= 2;
-						candidate.score += abs(red- Red(pixels[cy*W + cx]));
+						candidate.score += abs(red - Red(pixels[cy*W + cx]));
 						candidate.score += abs(green - Green(pixels[cy*W + cx]));
 						candidate.score += abs(blue - Blue(pixels[cy*W + cx]));
 					}
 				}
-				box.push_back(candidate);
+				if (box.score > candidate.score) {
+					box = candidate;
+				}
 			}
-			sort(box.begin(), box.end());
-			add({ box[0].y,box[0].x,box[0].r,box[0].color });
-			for (int radius = 0; radius <= r; radius++) {
+			add({ box.y,box.x,box.r,box.color });
+			for (int radius = 0; radius <= box.r; radius++) {
 				for (auto i : search[radius]) {
-					int cy = box[0].y + i.first;
-					int cx = box[0].x + i.second;
-					if (cy<0 || cy>=H || cx<0 || cx>=W) {
+					int cy = box.y + i.first;
+					int cx = box.x + i.second;
+					if (cy<0 || cy >= H || cx<0 || cx >= W) {
 						continue;
 					}
 					int red, blue, green;
-					red = Red(box[0].color) + Red(C[cy*W + cx]);
+					red = Red(box.color) + Red(C[cy*W + cx]);
 					red /= 2;
-					green = Green(box[0].color) + Green(C[cy*W + cx]);
+					green = Green(box.color) + Green(C[cy*W + cx]);
 					green /= 2;
-					blue = Blue(box[0].color) + Blue(C[cy*W + cx]);
+					blue = Blue(box.color) + Blue(C[cy*W + cx]);
 					blue /= 2;
 					C[cy*W + cx] = (red << 16) + (green << 8) + blue;
 				}
